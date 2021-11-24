@@ -65,7 +65,7 @@ public class Main {
   }
 
   // 简单打印应答
-  private void dumpResponse(AlipayResponse response) {
+  private static void dumpResponse(AlipayResponse response) {
     if (response != null) {
       log.info(String.format("code:%s, msg:%s", response.getCode(), response.getMsg()));
       if (StringUtils.isNotEmpty(response.getSubCode())) {
@@ -77,8 +77,6 @@ public class Main {
   }
 
   public static void main(String[] args) {
-    Main main = new Main();
-
     // 系统商商测试交易保障接口api
     //        main.test_monitor_sys();
 
@@ -98,29 +96,12 @@ public class Main {
     //        main.test_trade_refund();
 
     // 测试当面付2.0生成支付二维码
-    main.test_trade_precreate();
+    test_trade_precreate();
   }
 
-  // 测试系统商交易保障调度
-  public void test_monitor_schedule_logic() {
-    // 启动交易保障线程
-    DemoHbRunner demoRunner = new DemoHbRunner(monitorService);
-    demoRunner.setDelay(5); // 设置启动后延迟5秒开始调度，不设置则默认3秒
-    demoRunner.setDuration(10); // 设置间隔10秒进行调度，不设置则默认15 * 60秒
-    demoRunner.schedule();
-
-    // 启动当面付，此处每隔5秒调用一次支付接口，并且当随机数为0时交易保障线程退出
-    while (Math.random() != 0) {
-      test_trade_pay(tradeWithHBService);
-      Utils.sleep(5 * 1000);
-    }
-
-    // 满足退出条件后可以调用shutdown优雅安全退出
-    demoRunner.shutdown();
-  }
 
   // 系统商的调用样例，填写了所有系统商商需要填写的字段
-  public void test_monitor_sys() {
+  public static void test_monitor_sys() {
     // 系统商使用的交易信息格式，json字符串类型
     List<SysTradeInfo> sysTradeInfoList = new ArrayList<SysTradeInfo>();
     sysTradeInfoList.add(SysTradeInfo.newInstance("00000001", 5.2, HbStatus.S));
@@ -132,15 +113,9 @@ public class Main {
     // 填写异常信息，如果有的话
     List<ExceptionInfo> exceptionInfoList = new ArrayList<ExceptionInfo>();
     exceptionInfoList.add(ExceptionInfo.HE_SCANER);
-    //        exceptionInfoList.add(ExceptionInfo.HE_PRINTER);
-    //        exceptionInfoList.add(ExceptionInfo.HE_OTHER);
-
     // 填写扩展参数，如果有的话
     Map<String, Object> extendInfo = new HashMap<String, Object>();
-    //        extendInfo.put("SHOP_ID", "BJ_ZZ_001");
-    //        extendInfo.put("TERMINAL_ID", "1234");
-
-    String appAuthToken = "应用授权令牌"; // 根据真实值填写
+    String appAuthToken = "2^pKJ!*meWufHYW2H&eD"; // 根据真实值填写
 
     AlipayHeartbeatSynRequestBuilder builder =
         new AlipayHeartbeatSynRequestBuilder()
@@ -178,8 +153,6 @@ public class Main {
 
     // 填写扩展参数，如果有的话
     Map<String, Object> extendInfo = new HashMap<String, Object>();
-    //        extendInfo.put("SHOP_ID", "BJ_ZZ_001");
-    //        extendInfo.put("TERMINAL_ID", "1234");
 
     AlipayHeartbeatSynRequestBuilder builder =
         new AlipayHeartbeatSynRequestBuilder()
@@ -201,8 +174,7 @@ public class Main {
             .setIp("192.168.1.188")
             .setPosTradeInfoList(posTradeInfoList) // POS厂商同步trade_info信息
             //                .setExceptionInfoList(exceptionInfoList) // 填写异常信息，如果有的话
-            .setExtendInfo(extendInfo) // 填写扩展信息，如果有的话
-        ;
+            .setExtendInfo(extendInfo); // 填写扩展信息，如果有的话
 
     MonitorHeartbeatSynResponse response = monitorService.heartbeatSyn(builder);
     dumpResponse(response);
@@ -391,7 +363,7 @@ public class Main {
   }
 
   // 测试当面付2.0生成支付二维码
-  public void test_trade_precreate() {
+  public static void test_trade_precreate() {
     // (必填) 商户网站订单系统中唯一订单号，64个字符以内，只能包含字母、数字、下划线，
     // 需保证商户系统端不能重复，建议通过数据库sequence生成，
     String outTradeNo =
