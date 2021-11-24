@@ -188,7 +188,7 @@ public class Main {
         "tradepay" + System.currentTimeMillis() + (long) (Math.random() * 10000000L);
 
     // (必填) 订单标题，粗略描述用户的支付目的。如“xxx品牌xxx门店消费”
-    String subject = "xxx品牌xxx门店当面付消费";
+    String subject = "";
 
     // (必填) 订单总金额，单位为元，不能超过1亿元
     // 如果同时传入了【打折金额】,【不可打折金额】,【订单总金额】三者,则必须满足如下条件:【订单总金额】=【打折金额】+【不可打折金额】
